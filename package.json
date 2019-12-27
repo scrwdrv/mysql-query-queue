@@ -23,5 +23,13 @@
   "bugs": {
     "url": "https://github.com/scrwdrv/mysql-query-queue/issues"
   },
-  "homepage": "https://github.com/scrwdrv/mysql-query-queue#readme"
+  "homepage": "https://github.com/scrwdrv/mysql-query-queue#readme",
+  "devDependencies": {
+    "@types/node": "^13.1.1"
+  },
+  "dependencies": {
+    "fast-ipc": "^1.0.6",
+    "mysql2": "^2.1.0",
+    "recurdir": "^1.0.5"
+  }
 }
