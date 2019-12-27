@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/scrwdrv/mysql-query-queue#readme",
   "devDependencies": {
+    "@types/mysql2": "github:types/mysql2",
     "@types/node": "^13.1.1"
   },
   "dependencies": {
