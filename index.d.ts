@@ -19,14 +19,15 @@ export declare class mysqlServer {
         database: string;
         backupPath: string;
     });
-    connect(): any;
+    connect(): mysql.Connection;
     clear(): Promise<unknown>;
-    backup(callback: (err: any) => void): any;
+    backupPromise(): Promise<unknown>;
+    backup(callback: (err?: any) => void): any;
+    untilConnected(): Promise<unknown>;
 }
 export declare class mysqlClient {
     private system;
     private cluster;
-    private ipcClient;
     low: exec;
     high: exec;
     instant: exec;

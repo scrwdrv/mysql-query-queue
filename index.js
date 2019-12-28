@@ -108,20 +108,40 @@ class mysqlServer {
             });
         });
     }
-    async backup(callback) {
+    backupPromise() {
+        return new Promise((resolve, reject) => {
+            this.untilConnected().then(() => {
+                recurdir.mk(this.backupPath).then(() => {
+                    const mysqlBackupProcess = child_process_1.exec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`, (err) => {
+                        mysqlBackupProcess.kill();
+                        if (err)
+                            return reject(err);
+                        resolve();
+                    });
+                }).catch(reject);
+            });
+        });
+    }
+    backup(callback) {
         if (!this.pool)
             return setTimeout(() => this.backup(callback), 1000);
-        try {
-            await recurdir.mk(this.backupPath);
-        }
-        catch (err) {
-            return console.log(err);
-        }
-        const mysqlBackupProcess = child_process_1.exec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`, (err) => {
-            mysqlBackupProcess.kill();
-            if (err)
-                return callback(err);
-            callback(null);
+        recurdir.mk(this.backupPath).then(() => {
+            const mysqlBackupProcess = child_process_1.exec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`, (err) => {
+                mysqlBackupProcess.kill();
+                if (err)
+                    return callback(err);
+                callback();
+            });
+        }).catch(callback);
+    }
+    untilConnected() {
+        return new Promise((resolve) => {
+            const checkPool = () => {
+                if (!this.pool)
+                    return setTimeout(() => checkPool(), 500);
+                resolve();
+            };
+            checkPool();
         });
     }
 }
@@ -130,13 +150,13 @@ class mysqlClient {
     constructor(options) {
         for (let part in options)
             this[part] = options[part];
-        this.ipcClient = new ipc.client('mysql');
+        const ipcClient = new ipc.client('mysql');
         for (let priority of priorities)
             this[priority] = (msg, callback) => {
                 if (typeof msg !== 'object')
-                    this.ipcClient.send(priority, [this.system, this.cluster, msg], callback);
+                    ipcClient.send(priority, [this.system, this.cluster, msg], callback);
                 else
-                    this.ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
+                    ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
             };
     }
     date(offset = 0) {
