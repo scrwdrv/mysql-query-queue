@@ -163,13 +163,13 @@ export class mysqlClient {
         for (let priority of priorities)
             this[priority] = (msg: string | string[], callback: (err: any, result: any) => void) => {
                 if (typeof msg !== 'object')
-                    this.ipcClient.send(priority, [this.system, this.cluster, msg], callback)
-                else this.ipcClient.send(priority, [this.system, this.cluster, ...msg], callback)
+                    this.ipcClient.send(priority, [this.system, this.cluster, msg], callback);
+                else this.ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
             }
     }
 
     date(offset = 0) {
-        return new Date(Date.now() + offset).toISOString().slice(0, 10)
+        return new Date(Date.now() + offset).toISOString().slice(0, 10);
     }
 
     escape(str: string) {
@@ -177,6 +177,6 @@ export class mysqlClient {
     }
 
     quote(str: string) {
-        return '`' + str + '`'
+        return '`' + str + '`';
     }
 }
