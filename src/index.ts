@@ -130,7 +130,16 @@ export class mysqlServer {
 
     backupPromise() {
         return new Promise((resolve, reject) => {
-
+            this.untilConnected().then(() => {
+                recurdir.mk(this.backupPath).then(() => {
+                    const mysqlBackupProcess = childExec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`,
+                        (err) => {
+                            mysqlBackupProcess.kill();
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                }).catch(reject);
+            });
         });
     }
 
