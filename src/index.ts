@@ -128,7 +128,16 @@ export class mysqlServer {
         });
     }
 
+    backupPromise() {
+        return new Promise((resolve, reject) => {
+ 
+
+        })
+    }
+
+
     backup(callback: (err?: any) => void) {
+
         if (!this.pool) return setTimeout(() => this.backup(callback), 1000);
 
         recurdir.mk(this.backupPath).then(() => {
