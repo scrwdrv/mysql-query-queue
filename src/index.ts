@@ -128,21 +128,17 @@ export class mysqlServer {
         });
     }
 
-    async backup(callback: (err: any) => void) {
+    backup(callback: (err?: any) => void) {
         if (!this.pool) return setTimeout(() => this.backup(callback), 1000);
 
-        try {
-            await recurdir.mk(this.backupPath);
-        } catch (err) {
-            return console.log(err)
-        }
-
-        const mysqlBackupProcess = childExec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`,
-            (err) => {
-                mysqlBackupProcess.kill();
-                if (err) return callback(err);
-                callback(null);
-            });
+        recurdir.mk(this.backupPath).then(() => {
+            const mysqlBackupProcess = childExec(`mysqldump -u ${this.user} -p"${this.password}" ${this.database} > ${this.backupPath}/${this.database}_${new Date().toISOString().slice(0, 10)}.sql`,
+                (err) => {
+                    mysqlBackupProcess.kill();
+                    if (err) return callback(err);
+                    callback();
+                });
+        }).catch(callback);
     }
 }
 
