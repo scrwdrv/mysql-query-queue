@@ -146,7 +146,6 @@ export class mysqlClient {
 
     private system: string;
     private cluster: number | string;
-    private ipcClient: ipc.client;
 
     public low: exec;
     public high: exec;
@@ -158,13 +157,14 @@ export class mysqlClient {
     }) {
         for (let part in options)
             this[part] = options[part];
-        this.ipcClient = new ipc.client('mysql');
+
+        const ipcClient = new ipc.client('mysql');
 
         for (let priority of priorities)
             this[priority] = (msg: string | string[], callback: (err: any, result: any) => void) => {
                 if (typeof msg !== 'object')
-                    this.ipcClient.send(priority, [this.system, this.cluster, msg], callback);
-                else this.ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
+                    ipcClient.send(priority, [this.system, this.cluster, msg], callback);
+                else ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
             }
     }
 
