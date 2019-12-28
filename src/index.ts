@@ -55,27 +55,49 @@ export class mysqlServer {
                 cluster: req[1]
                 */
                 const sql = req.slice(2),
-                    queriesLastIndex = sql.length - 1,
-                    queryExec = () => {
+                    queriesLength = sql.length,
+                    next = (err: mysql.QueryError, results: any[]) => {
+                        res(err, queriesLength > 1 ? results : results[0]);
+                        if (this.queryQueue.high[0])
+                            this.queryQueue.high.shift()();
+                        else if (this.queryQueue.low[0])
+                            this.queryQueue.low.shift()();
+                        else
+                            this.queryRunning = false;
+                    },
+                    queryExec = async () => {
                         this.queryRunning = true;
-                        const exec = (i = 0, results = []) => {
-                            if (!this.pool) return setTimeout(exec, 500, i, results);
-                            this.pool.query(sql[i], (err, result) => {
-                                results.push(result);
-                                if (i === queriesLastIndex || err) {
-                                    res(err, queriesLastIndex ? results : results[0]);
 
-                                    if (this.queryQueue.high[0])
-                                        this.queryQueue.high.shift()();
-                                    else if (this.queryQueue.low[0])
-                                        this.queryQueue.low.shift()();
-                                    else
-                                        this.queryRunning = false;
+                        let results = [];
 
-                                } else exec(i + 1, results);
+                        for (let i = 0; i < queriesLength; i++)
+                            await new Promise((resolve) => {
+                                this.pool.query(sql[i], (err, result) => {
+                                    results.push(result);
+                                    if (err) return next(err, results);
+                                    resolve();
+                                });
                             });
-                        }
-                        exec();
+
+                        next(null, results);
+                        /*  const exec = (i = 0, results = []) => {
+                             if (!this.pool) return setTimeout(exec, 500, i, results);
+                             this.pool.query(sql[i], (err, result) => {
+                                 results.push(result);
+                                 if (i === queriesLastIndex || err) {
+                                     res(err, queriesLastIndex ? results : results[0]);
+ 
+                                     if (this.queryQueue.high[0])
+                                         this.queryQueue.high.shift()();
+                                     else if (this.queryQueue.low[0])
+                                         this.queryQueue.low.shift()();
+                                     else
+                                         this.queryRunning = false;
+ 
+                                 } else exec(i + 1, results);
+                             });
+                         }
+                         exec(); */
                     }
 
                 if (this.queryRunning)
