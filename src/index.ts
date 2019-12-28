@@ -130,9 +130,8 @@ export class mysqlServer {
 
     backupPromise() {
         return new Promise((resolve, reject) => {
- 
 
-        })
+        });
     }
 
 
@@ -148,6 +147,16 @@ export class mysqlServer {
                     callback();
                 });
         }).catch(callback);
+    }
+
+    untilConnected() {
+        return new Promise((resolve) => {
+            const checkPool = () => {
+                if (!this.pool) return setTimeout(() => checkPool(), 500);
+                resolve();
+            }
+            checkPool();
+        })
     }
 }
 
