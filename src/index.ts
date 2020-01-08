@@ -60,8 +60,7 @@ export class mysqlServer {
                         this.queryRunning = true;
                         const exec = (i = 0, results = []) => {
                             if (!this.pool) return setTimeout(exec, 500, i, results);
-                            this.pool.query(sql[i], (err, result) => {
-                                results.push(result);
+                            const next = (err?: mysql.QueryError) => {
                                 if (i === queriesLastIndex || err) {
                                     res(err, queriesLastIndex ? results : results[0]);
 
@@ -73,6 +72,13 @@ export class mysqlServer {
                                         this.queryRunning = false;
 
                                 } else exec(i + 1, results);
+                            }
+
+                            if (!sql[i]) return results.push(null), next();
+                            this.pool.query(sql[i], (err, result) => {
+                                results.push(result);
+                                if (err) return next(err);
+                                next();
                             });
                         }
 
