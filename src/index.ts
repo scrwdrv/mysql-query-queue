@@ -4,8 +4,7 @@ import * as recurdir from 'recurdir';
 import { exec as childExec } from 'child_process';
 
 const priorities = ['low', 'high', 'instant'];
-type exec = (msg: any, callback: (err: any, result: any) => void) => void;
-
+type exec = <T extends string | string[]>(msg: T, callback: (err: mysql.QueryError, result: T extends string ? any : any[]) => void) => void;
 
 export class mysqlServer {
 
@@ -195,9 +194,9 @@ export class mysqlClient {
         const ipcClient = new ipc.client('mysql');
 
         for (let priority of priorities)
-            this[priority] = (msg: string | string[], callback: (err: any, result: any) => void) => {
+            this[priority] = <T extends string | string[]>(msg: T, callback: (err: mysql.QueryError, result: T extends string ? any : any[]) => void) => {
                 if (typeof msg !== 'object')
-                    ipcClient.send(priority, [this.system, this.cluster, msg], callback);
+                    ipcClient.send(priority, [this.system, this.cluster, msg as string], callback);
                 else ipcClient.send(priority, [this.system, this.cluster, ...msg], callback);
             }
     }
