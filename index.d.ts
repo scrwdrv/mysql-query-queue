@@ -1,5 +1,5 @@
 import * as mysql from 'mysql2';
-declare type exec = (msg: any, callback: (err: any, result: any) => void) => void;
+declare type exec = <T extends string | string[]>(msg: T, callback: (err: mysql.QueryError, result: T extends string ? any : any[]) => void) => void;
 export declare class mysqlServer {
     private host;
     private user;
