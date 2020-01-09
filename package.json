@@ -1,6 +1,6 @@
 {
   "name": "mysql-query-queue",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "This module is design for clustering, it queues MySQL queries and execute them by priority. Also provided some useful methods, e.g., backup, clear, escape query string...   ",
   "main": "index.js",
   "scripts": {
