@@ -1,6 +1,6 @@
 {
   "name": "mysql-query-queue",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This module is design for clustering, it queues MySQL queries and execute them by priority. Also provided some useful methods, e.g., backup, clear, escape query string...   ",
   "main": "index.js",
   "scripts": {
@@ -26,10 +26,10 @@
   "homepage": "https://github.com/scrwdrv/mysql-query-queue#readme",
   "devDependencies": {
     "@types/mysql2": "github:types/mysql2",
-    "@types/node": "^13.1.1"
+    "@types/node": "^13.1.6"
   },
   "dependencies": {
-    "fast-ipc": "^1.0.7",
+    "fast-ipc": "^1.0.8",
     "mysql2": "^2.1.0",
     "recurdir": "^1.0.5"
   }
